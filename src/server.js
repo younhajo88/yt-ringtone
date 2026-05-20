@@ -7,7 +7,7 @@ import { config } from './config.js';
 import { AppError, sendError } from './errors.js';
 import { checkTools } from './tools.js';
 import { createClip, createTrack, getClip, getTrack } from './jobs.js';
-import { downloadAudio, searchYouTube } from './youtube.js';
+import { downloadAudio, getYouTubeInfo, searchYouTube } from './youtube.js';
 import { isYouTubeUrl, sanitizeFilePart, validateSearchQuery, validateStartSeconds } from './validation.js';
 
 const currentFile = fileURLToPath(import.meta.url);
@@ -16,6 +16,7 @@ const publicDir = path.join(config.rootDir, 'public');
 const defaultServices = {
   createThirtySecondClip,
   downloadAudio,
+  getYouTubeInfo,
   probeDurationSeconds,
   searchYouTube,
 };
@@ -43,7 +44,9 @@ export function createApp(options = {}) {
         throw new AppError('유효한 YouTube URL을 입력해 주세요.', 400, 'INVALID_YOUTUBE_URL');
       }
 
-      const title = validateTitle(req.body?.title);
+      const info = await services.getYouTubeInfo(url);
+      rejectTooLong(info.duration);
+      const title = validateTitle(req.body?.title || info.title);
       const placeholderTrack = createTrack({
         title,
         sourcePath: '',
@@ -149,4 +152,16 @@ if (process.argv[1] === currentFile) {
 function validateTitle(value) {
   const title = String(value || '').trim();
   return title || 'audio';
+}
+
+function rejectTooLong(duration) {
+  const seconds = Number(duration);
+  if (Number.isFinite(seconds) && seconds > config.maxSourceDurationSeconds) {
+    const maxMinutes = Math.floor(config.maxSourceDurationSeconds / 60);
+    throw new AppError(
+      `영상이 너무 깁니다. ${maxMinutes}분 이하 영상만 준비할 수 있습니다.`,
+      400,
+      'VIDEO_TOO_LONG',
+    );
+  }
 }

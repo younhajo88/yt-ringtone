@@ -13,6 +13,7 @@ const editorTitle = document.querySelector('#editor-title');
 
 let selectedTrackId = null;
 let selectedTitle = '';
+let statusTimer = null;
 
 setStatus('검색어 또는 YouTube URL을 입력하세요.');
 
@@ -106,22 +107,26 @@ function renderResults(items) {
 
 async function prepareTrack(url, title) {
   clearEditor();
-  setStatus('오디오를 준비하는 중입니다. 영상 길이에 따라 시간이 걸릴 수 있습니다.');
-  const track = await postJson('/api/prepare', { url, title });
+  startStatusTimer('오디오를 준비하는 중입니다');
+  try {
+    const track = await postJson('/api/prepare', { url, title });
 
-  selectedTrackId = track.id;
-  selectedTitle = track.title;
-  editorTitle.textContent = track.title;
-  previewAudio.src = track.audioUrl;
+    selectedTrackId = track.id;
+    selectedTitle = track.title;
+    editorTitle.textContent = track.title;
+    previewAudio.src = track.audioUrl;
 
-  const maxStart = Math.max(0, Math.floor(Number(track.durationSeconds || 0) - 30));
-  startRange.max = String(maxStart);
-  startInput.max = String(maxStart);
-  startRange.value = '0';
-  startInput.value = '0';
+    const maxStart = Math.max(0, Math.floor(Number(track.durationSeconds || 0) - 30));
+    startRange.max = String(maxStart);
+    startInput.max = String(maxStart);
+    startRange.value = '0';
+    startInput.value = '0';
 
-  editorSection.hidden = false;
-  setStatus('미리듣기 후 시작 시간을 선택하세요.');
+    editorSection.hidden = false;
+    setStatus('미리듣기 후 시작 시간을 선택하세요.');
+  } finally {
+    stopStatusTimer();
+  }
 }
 
 async function postJson(path, body) {
@@ -153,6 +158,24 @@ function clearEditor() {
 function setStatus(message, isError = false) {
   status.textContent = message;
   status.dataset.state = isError ? 'error' : 'info';
+}
+
+function startStatusTimer(prefix) {
+  stopStatusTimer();
+  const startedAt = Date.now();
+  const update = () => {
+    const elapsed = Math.floor((Date.now() - startedAt) / 1000);
+    setStatus(`${prefix}. ${elapsed}초 경과. 긴 영상은 준비할 수 없습니다.`);
+  };
+  update();
+  statusTimer = setInterval(update, 1000);
+}
+
+function stopStatusTimer() {
+  if (statusTimer) {
+    clearInterval(statusTimer);
+    statusTimer = null;
+  }
 }
 
 function setBusy(form, busy) {

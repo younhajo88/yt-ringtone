@@ -70,6 +70,7 @@ test('prepare creates a playable track id', async () => {
   await fs.writeFile(audioPath, 'fake mp3 bytes');
 
   await withServer({
+    getYouTubeInfo: async () => ({ title: 'Demo Song', duration: 120 }),
     downloadAudio: async () => audioPath,
     probeDurationSeconds: async () => 120,
   }, async baseUrl => {
@@ -84,6 +85,28 @@ test('prepare creates a playable track id', async () => {
     assert.equal(body.title, 'Demo Song');
     assert.equal(body.durationSeconds, 120);
     assert.match(body.audioUrl, /^\/api\/audio\//);
+  });
+});
+
+test('prepare rejects videos above the configured duration limit before download', async () => {
+  let downloadCalled = false;
+
+  await withServer({
+    getYouTubeInfo: async () => ({ title: 'Long playlist', duration: 27_576 }),
+    downloadAudio: async () => {
+      downloadCalled = true;
+    },
+  }, async baseUrl => {
+    const response = await fetch(`${baseUrl}/api/prepare`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ url: 'https://youtu.be/D-SPzWajMFQ', title: 'Long playlist' }),
+    });
+    const body = await response.json();
+
+    assert.equal(response.status, 400);
+    assert.equal(body.error.code, 'VIDEO_TOO_LONG');
+    assert.equal(downloadCalled, false);
   });
 });
 
@@ -108,6 +131,7 @@ test('clip creates a download URL for prepared track', async () => {
   await fs.writeFile(audioPath, 'fake mp3 bytes');
 
   await withServer({
+    getYouTubeInfo: async () => ({ title: 'Demo Song', duration: 120 }),
     downloadAudio: async () => audioPath,
     probeDurationSeconds: async () => 120,
     createThirtySecondClip: async (_previewPath, outputPath) => {

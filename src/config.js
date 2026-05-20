@@ -11,6 +11,7 @@ export const config = {
   dataDir: process.env.DATA_DIR || path.join(rootDir, 'data'),
   maxSearchResults: 5,
   maxQueryLength: 120,
+  maxSourceDurationSeconds: Number(process.env.MAX_SOURCE_DURATION_SECONDS || 1800),
   clipDurationSeconds: 30,
   commandTimeoutMs: 120000,
   ytdlpCommand: process.env.YTDLP_COMMAND || 'yt-dlp',

@@ -17,6 +17,24 @@ export async function searchYouTube(query) {
   return parseSearchResults(stdout);
 }
 
+export async function getYouTubeInfo(url) {
+  if (!isYouTubeUrl(url)) {
+    throw new AppError('유효한 YouTube URL을 입력해 주세요.', 400, 'INVALID_YOUTUBE_URL');
+  }
+
+  const { stdout } = await runCommand(config.ytdlpCommand, [
+    '--extractor-args',
+    'youtube:player_client=android',
+    '--dump-json',
+    '--no-playlist',
+    '--skip-download',
+    '--no-warnings',
+    url,
+  ], { timeoutMs: 30000 });
+
+  return normalizeSearchItem(parseJsonLine(stdout.trim()));
+}
+
 export function parseSearchResults(stdout) {
   const lines = stdout.split(/\r?\n/).filter(line => line.trim());
 

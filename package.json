@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --input-type=module --eval \"import fs from 'node:fs'; const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); if (pkg.scripts.start !== 'node src/server.js') throw new Error('start script must run node src/server.js'); if (pkg.scripts.dev !== 'node --watch src/server.js') throw new Error('dev script must watch src/server.js'); const required = ['src/config.js', 'src/server.js', 'public/index.html', 'public/styles.css', 'public/app.js']; for (const file of required) { if (!fs.existsSync(file)) throw new Error(`Missing required scaffold file: ${file}`); } const server = await import('./src/server.js'); if (typeof server.createApp !== 'function') throw new Error('server must export createApp'); if (typeof server.startServer !== 'function') throw new Error('server must export startServer'); const app = fs.readFileSync('public/app.js', 'utf8'); if (!app.includes('preventDefault')) throw new Error('search form submit must prevent page reload'); if (!app.includes('검색 기능은 다음 단계에서 연결됩니다.')) throw new Error('search form submit must set placeholder Korean status');\""
+    "test": "node --test"
   },
   "dependencies": {
     "express": "^4.19.2"

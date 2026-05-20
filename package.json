@@ -1,0 +1,13 @@
+{
+  "name": "yt-ringtone",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --input-type=module --eval \"import express from 'express'; import { config } from './src/config.js'; const app = express(); app.use(express.static('public')); app.listen(config.port, config.host, () => console.log(`yt-ringtone listening on http://${config.host}:${config.port}`));\"",
+    "dev": "npm run start",
+    "test": "node --input-type=module --eval \"import fs from 'node:fs'; const required = ['src/config.js', 'public/index.html', 'public/styles.css', 'public/app.js']; for (const file of required) { if (!fs.existsSync(file)) throw new Error(`Missing required scaffold file: ${file}`); }\""
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

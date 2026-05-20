@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>유튜브 벨소리 만들기</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="app-header">
+        <p class="eyebrow">벨소리 도구</p>
+        <h1>유튜브 벨소리 만들기</h1>
+      </header>
+
+      <section class="workspace" aria-labelledby="search-title">
+        <h2 id="search-title">영상 검색</h2>
+        <form id="search-form" class="search-form">
+          <label for="search-query">유튜브 검색어</label>
+          <div class="input-row">
+            <input id="search-query" name="query" type="search" maxlength="120" autocomplete="off" placeholder="노래 제목 또는 영상 키워드">
+            <button type="submit">검색</button>
+          </div>
+        </form>
+        <p id="status" class="status" role="status" aria-live="polite">앱을 준비하고 있습니다.</p>
+      </section>
+
+      <section id="results-section" class="workspace" aria-labelledby="results-title">
+        <h2 id="results-title">검색 결과</h2>
+        <div id="results" class="results" aria-live="polite"></div>
+      </section>
+
+      <section id="editor-section" class="workspace editor" aria-labelledby="editor-title" hidden>
+        <h2 id="editor-title">벨소리 편집</h2>
+        <audio id="preview-audio" controls preload="metadata"></audio>
+        <form id="clip-form" class="clip-form">
+          <label for="clip-start-range">시작 시간</label>
+          <div class="range-row">
+            <input id="clip-start-range" name="startRange" type="range" min="0" max="0" value="0" step="1">
+            <input id="clip-start-input" name="start" type="number" min="0" value="0" step="1" inputmode="numeric">
+            <span class="unit">초</span>
+          </div>
+          <button id="clip-button" type="submit">30초 벨소리 만들기</button>
+        </form>
+        <a id="download-link" class="download-link" href="#" download hidden>벨소리 다운로드</a>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

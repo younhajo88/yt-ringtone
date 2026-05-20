@@ -1,0 +1,177 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f8f5;
+  --surface: #ffffff;
+  --text: #20231f;
+  --muted: #62695f;
+  --line: #d7dccf;
+  --accent: #0f766e;
+  --accent-dark: #0b5f59;
+  --danger: #9f2d2d;
+  --radius: 8px;
+  --control-height: 44px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.5;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  min-height: var(--control-height);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0 16px;
+}
+
+button:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 3px solid rgba(15, 118, 110, 0.28);
+  outline-offset: 2px;
+}
+
+input {
+  min-height: var(--control-height);
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--text);
+  padding: 0 12px;
+}
+
+input[type="range"] {
+  padding: 0;
+}
+
+.app-shell {
+  width: min(100%, 760px);
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+}
+
+.app-header {
+  margin-bottom: 24px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--accent-dark);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 0;
+  font-size: clamp(2rem, 12vw, 3rem);
+  line-height: 1.05;
+}
+
+h2 {
+  margin-bottom: 16px;
+  font-size: 1.15rem;
+}
+
+.workspace {
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: 18px;
+}
+
+.search-form,
+.clip-form {
+  display: grid;
+  gap: 10px;
+}
+
+label {
+  color: var(--muted);
+  font-size: 0.93rem;
+  font-weight: 700;
+}
+
+.input-row,
+.range-row {
+  display: grid;
+  gap: 10px;
+}
+
+.range-row {
+  grid-template-columns: 1fr 88px auto;
+  align-items: center;
+}
+
+.status {
+  min-height: 24px;
+  margin: 14px 0 0;
+  color: var(--muted);
+}
+
+.results {
+  min-height: 72px;
+}
+
+.editor audio {
+  display: block;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.unit {
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.download-link {
+  display: inline-flex;
+  min-height: var(--control-height);
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  border-radius: 6px;
+  background: #26322f;
+  color: #ffffff;
+  font-weight: 800;
+  padding: 0 16px;
+  text-decoration: none;
+}
+
+@media (min-width: 640px) {
+  .app-shell {
+    padding-top: 40px;
+  }
+
+  .input-row {
+    grid-template-columns: 1fr 108px;
+  }
+}

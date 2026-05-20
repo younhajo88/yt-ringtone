@@ -3,9 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node --input-type=module --eval \"import express from 'express'; import { config } from './src/config.js'; const app = express(); app.use(express.static('public')); app.listen(config.port, config.host, () => console.log(`yt-ringtone listening on http://${config.host}:${config.port}`));\"",
-    "dev": "npm run start",
-    "test": "node --input-type=module --eval \"import fs from 'node:fs'; const required = ['src/config.js', 'public/index.html', 'public/styles.css', 'public/app.js']; for (const file of required) { if (!fs.existsSync(file)) throw new Error(`Missing required scaffold file: ${file}`); }\""
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --input-type=module --eval \"import fs from 'node:fs'; const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8')); if (pkg.scripts.start !== 'node src/server.js') throw new Error('start script must run node src/server.js'); if (pkg.scripts.dev !== 'node --watch src/server.js') throw new Error('dev script must watch src/server.js'); const required = ['src/config.js', 'public/index.html', 'public/styles.css', 'public/app.js']; for (const file of required) { if (!fs.existsSync(file)) throw new Error(`Missing required scaffold file: ${file}`); } const app = fs.readFileSync('public/app.js', 'utf8'); if (!app.includes('preventDefault')) throw new Error('search form submit must prevent page reload'); if (!app.includes('검색 기능은 다음 단계에서 연결됩니다.')) throw new Error('search form submit must set placeholder Korean status');\""
   },
   "dependencies": {
     "express": "^4.19.2"

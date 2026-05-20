@@ -6,6 +6,8 @@ const YOUTUBE_HOSTS = new Set([
   'm.youtube.com',
   'youtu.be',
 ]);
+const YOUTUBE_PROTOCOLS = new Set(['http:', 'https:']);
+const WINDOWS_RESERVED_BASENAMES = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
 
 export function isYouTubeUrl(value) {
   if (typeof value !== 'string' || value.trim() === '') {
@@ -14,7 +16,7 @@ export function isYouTubeUrl(value) {
 
   try {
     const url = new URL(value);
-    return YOUTUBE_HOSTS.has(url.hostname.toLowerCase());
+    return YOUTUBE_PROTOCOLS.has(url.protocol) && YOUTUBE_HOSTS.has(url.hostname.toLowerCase());
   } catch {
     return false;
   }
@@ -35,6 +37,17 @@ export function validateSearchQuery(value, maxLength) {
 }
 
 export function validateStartSeconds(value, durationSeconds, clipDurationSeconds) {
+  if (
+    value === null ||
+    value === undefined ||
+    typeof value === 'boolean' ||
+    Array.isArray(value) ||
+    typeof value === 'object' ||
+    (typeof value === 'string' && value.trim() === '')
+  ) {
+    throw new AppError('시작 시간은 숫자로 입력해 주세요.', 400, 'INVALID_START_SECONDS');
+  }
+
   const start = Number(value);
 
   if (!Number.isFinite(start)) {
@@ -56,10 +69,20 @@ export function validateStartSeconds(value, durationSeconds, clipDurationSeconds
 }
 
 export function sanitizeFilePart(value) {
-  const sanitized = String(value ?? '')
+  let sanitized = String(value ?? '')
     .replace(/[<>:"/\\|?*\x00-\x1f\s]+/g, '_')
     .replace(/_+/g, '_')
-    .replace(/^_+|_+$/g, '');
+    .replace(/^_+|_+$/g, '')
+    .replace(/[._]+$/g, '');
+
+  if (!sanitized) {
+    return 'audio';
+  }
+
+  const [basename] = sanitized.split('.');
+  if (WINDOWS_RESERVED_BASENAMES.test(basename)) {
+    sanitized = `audio_${sanitized}`;
+  }
 
   return sanitized || 'audio';
 }

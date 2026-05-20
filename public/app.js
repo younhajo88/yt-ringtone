@@ -149,10 +149,16 @@ function clearResults() {
 function clearEditor() {
   selectedTrackId = null;
   selectedTitle = '';
-  previewAudio.removeAttribute('src');
-  previewAudio.load();
+  stopPreviewAudio();
   editorSection.hidden = true;
   downloadLink.hidden = true;
+}
+
+function stopPreviewAudio() {
+  previewAudio.pause();
+  previewAudio.currentTime = 0;
+  previewAudio.removeAttribute('src');
+  previewAudio.load();
 }
 
 function setStatus(message, isError = false) {

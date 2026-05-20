@@ -39,6 +39,8 @@ export async function downloadAudio(url, title, id) {
   const outputPath = path.join(source, `${safeId}-${safeTitle}.mp3`);
 
   await runCommand(config.ytdlpCommand, [
+    '--extractor-args',
+    'youtube:player_client=android',
     '-f',
     'bestaudio/best',
     '--no-playlist',

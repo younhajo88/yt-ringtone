@@ -86,6 +86,7 @@ export function createApp(options = {}) {
         config.clipDurationSeconds,
       );
       const clipName = `${sanitizeFilePart(track.title)}-ringtone.mp3`;
+      await ensureDataDirs();
       const outputPath = path.join(config.dataDir, 'clips', `${track.id}-${Date.now()}.mp3`);
 
       await services.createThirtySecondClip(track.previewPath, outputPath, startSeconds);

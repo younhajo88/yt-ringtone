@@ -20,25 +20,22 @@ export function isYouTubeUrl(value) {
   }
 }
 
-export function validateSearchQuery(query) {
-  if (typeof query !== 'string') {
+export function validateSearchQuery(value, maxLength) {
+  const query = String(value || '').trim();
+
+  if (query.length === 0) {
     throw new AppError('검색어를 입력해 주세요.', 400, 'EMPTY_QUERY');
   }
 
-  const trimmed = query.trim();
-  if (trimmed.length === 0) {
-    throw new AppError('검색어를 입력해 주세요.', 400, 'EMPTY_QUERY');
+  if (query.length > maxLength) {
+    throw new AppError(`검색어는 ${maxLength}자 이하로 입력해 주세요.`, 400, 'QUERY_TOO_LONG');
   }
 
-  if (trimmed.length > 100) {
-    throw new AppError('검색어는 100자 이하로 입력해 주세요.', 400, 'QUERY_TOO_LONG');
-  }
-
-  return trimmed;
+  return query;
 }
 
-export function validateStartSeconds(startSeconds, clipDuration, duration) {
-  const start = Number(startSeconds);
+export function validateStartSeconds(value, durationSeconds, clipDurationSeconds) {
+  const start = Number(value);
 
   if (!Number.isFinite(start)) {
     throw new AppError('시작 시간은 숫자로 입력해 주세요.', 400, 'INVALID_START_SECONDS');
@@ -48,11 +45,11 @@ export function validateStartSeconds(startSeconds, clipDuration, duration) {
     throw new AppError('시작 시간은 0초 이상이어야 합니다.', 400, 'NEGATIVE_START_SECONDS');
   }
 
-  if (Number.isFinite(Number(clipDuration)) && Number.isFinite(Number(duration))) {
-    const end = start + Number(clipDuration);
-    if (end > Number(duration)) {
-      throw new AppError('선택한 구간이 영상 길이를 초과합니다.', 400, 'CLIP_EXCEEDS_DURATION');
-    }
+  const duration = Number(durationSeconds);
+  const clipDuration = Number(clipDurationSeconds);
+
+  if (Number.isFinite(duration) && Number.isFinite(clipDuration) && start + clipDuration > duration) {
+    throw new AppError('선택한 구간이 영상 길이를 초과합니다.', 400, 'CLIP_EXCEEDS_DURATION');
   }
 
   return start;
@@ -60,8 +57,9 @@ export function validateStartSeconds(startSeconds, clipDuration, duration) {
 
 export function sanitizeFilePart(value) {
   const sanitized = String(value ?? '')
-    .replace(/[<>:"/\\|?*\x00-\x1f]/g, '')
-    .trim();
+    .replace(/[<>:"/\\|?*\x00-\x1f\s]+/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_+|_+$/g, '');
 
   return sanitized || 'audio';
 }

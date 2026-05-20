@@ -27,54 +27,54 @@ describe('isYouTubeUrl', () => {
 });
 
 describe('validateSearchQuery', () => {
-  test('returns a trimmed valid query', () => {
-    assert.equal(validateSearchQuery('  lo-fi ringtone  '), 'lo-fi ringtone');
+  test('returns a trimmed valid query with a caller-provided limit', () => {
+    assert.equal(validateSearchQuery(' hello ', 10), 'hello');
   });
 
   test('rejects empty queries', () => {
     assert.throws(
-      () => validateSearchQuery('   '),
+      () => validateSearchQuery('   ', 10),
       error => error instanceof AppError && error.message === '검색어를 입력해 주세요.',
     );
   });
 
-  test('rejects overly long queries', () => {
+  test('rejects overly long queries using the caller-provided limit', () => {
     assert.throws(
-      () => validateSearchQuery('a'.repeat(101)),
-      error => error instanceof AppError && error.message === '검색어는 100자 이하로 입력해 주세요.',
+      () => validateSearchQuery('a'.repeat(11), 10),
+      error => error instanceof AppError && error.message === '검색어는 10자 이하로 입력해 주세요.',
     );
   });
 });
 
 describe('validateStartSeconds', () => {
   test('accepts valid start seconds', () => {
-    assert.equal(validateStartSeconds(0, 30, 120), 0);
-    assert.equal(validateStartSeconds(12.5, 30, 120), 12.5);
-    assert.equal(validateStartSeconds('15', 30, 120), 15);
+    assert.equal(validateStartSeconds(0, 100, 30), 0);
+    assert.equal(validateStartSeconds(12.5, 100, 30), 12.5);
+    assert.equal(validateStartSeconds('15', 100, 30), 15);
   });
 
   test('rejects negative and non-number values', () => {
     assert.throws(
-      () => validateStartSeconds(-1, 30, 120),
+      () => validateStartSeconds(-1, 100, 30),
       error => error instanceof AppError && error.message === '시작 시간은 0초 이상이어야 합니다.',
     );
     assert.throws(
-      () => validateStartSeconds('soon', 30, 120),
+      () => validateStartSeconds('soon', 100, 30),
       error => error instanceof AppError && error.message === '시작 시간은 숫자로 입력해 주세요.',
     );
   });
 
   test('rejects clips that exceed the source duration', () => {
     assert.throws(
-      () => validateStartSeconds(95, 30, 120),
+      () => validateStartSeconds(80, 100, 30),
       error => error instanceof AppError && error.message === '선택한 구간이 영상 길이를 초과합니다.',
     );
   });
 });
 
 describe('sanitizeFilePart', () => {
-  test('removes Windows-unsafe filename characters', () => {
-    assert.equal(sanitizeFilePart('a<b>c:d"e/f\\g|h?i*j'), 'abcdefghij');
+  test('replaces unsafe filename characters and whitespace with underscores', () => {
+    assert.equal(sanitizeFilePart('a/b:c*? song'), 'a_b_c_song');
   });
 
   test('returns audio when the sanitized result is empty', () => {
@@ -113,8 +113,8 @@ describe('errors', () => {
     assert.equal(res.statusCode, 500);
     assert.deepEqual(res.body, {
       error: {
-        code: 'SERVER_ERROR',
-        message: '서버 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.',
+        code: 'INTERNAL_ERROR',
+        message: '서버 오류가 발생했습니다.',
       },
     });
   });

@@ -8,6 +8,7 @@ const YOUTUBE_HOSTS = new Set([
 ]);
 const YOUTUBE_PROTOCOLS = new Set(['http:', 'https:']);
 const WINDOWS_RESERVED_BASENAMES = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
+const MAX_FILE_PART_LENGTH = 80;
 
 export function isYouTubeUrl(value) {
   if (typeof value !== 'string' || value.trim() === '') {
@@ -83,6 +84,10 @@ export function sanitizeFilePart(value) {
   if (WINDOWS_RESERVED_BASENAMES.test(basename)) {
     sanitized = `audio_${sanitized}`;
   }
+
+  sanitized = sanitized
+    .slice(0, MAX_FILE_PART_LENGTH)
+    .replace(/[._]+$/g, '');
 
   return sanitized || 'audio';
 }

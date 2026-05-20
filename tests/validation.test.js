@@ -94,6 +94,23 @@ describe('sanitizeFilePart', () => {
     assert.equal(sanitizeFilePart('song.'), 'song');
     assert.equal(sanitizeFilePart('song_.'), 'song');
   });
+
+  test('caps long normalized names at 80 characters', () => {
+    assert.equal(sanitizeFilePart('a'.repeat(120)), 'a'.repeat(80));
+  });
+
+  test('removes trailing dots and underscores after truncating long names', () => {
+    assert.equal(sanitizeFilePart(`${'a'.repeat(79)}_tail`), 'a'.repeat(79));
+    assert.equal(sanitizeFilePart(`${'a'.repeat(79)}.tail`), 'a'.repeat(79));
+  });
+
+  test('caps names after reserved basename handling', () => {
+    const sanitized = sanitizeFilePart(`CON.${'a'.repeat(120)}`);
+
+    assert.equal(sanitized.length, 80);
+    assert.equal(sanitized.startsWith('audio_CON.'), true);
+    assert.equal(/[._]$/.test(sanitized), false);
+  });
 });
 
 describe('errors', () => {

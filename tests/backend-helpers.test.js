@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, test } from 'node:test';
 
+import { config } from '../src/config.js';
 import { AppError } from '../src/errors.js';
 import { createClip, createTrack, getClip, getTrack } from '../src/jobs.js';
 import { runCommand } from '../src/processRunner.js';
-import { parseSearchResults } from '../src/youtube.js';
+import { downloadAudio, parseSearchResults } from '../src/youtube.js';
 
 describe('jobs', () => {
   test('stores tracks and clips by generated id', () => {
@@ -90,6 +91,22 @@ describe('parseSearchResults', () => {
 
   test('returns an empty list for blank yt-dlp output', () => {
     assert.deepEqual(parseSearchResults('  \n'), []);
+  });
+});
+
+describe('downloadAudio', () => {
+  test('rejects non-YouTube URLs before command execution', async () => {
+    const previousCommand = config.ytdlpCommand;
+    config.ytdlpCommand = 'definitely-not-a-real-command-for-this-test';
+
+    try {
+      await assert.rejects(
+        downloadAudio('https://example.com/watch?v=not-youtube', 'Title', 'video-id'),
+        error => error instanceof AppError && error.code === 'INVALID_YOUTUBE_URL' && error.status === 400,
+      );
+    } finally {
+      config.ytdlpCommand = previousCommand;
+    }
   });
 });
 

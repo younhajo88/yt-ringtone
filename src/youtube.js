@@ -4,7 +4,7 @@ import { config } from './config.js';
 import { AppError } from './errors.js';
 import { ensureDataDirs } from './audio.js';
 import { runCommand } from './processRunner.js';
-import { sanitizeFilePart } from './validation.js';
+import { isYouTubeUrl, sanitizeFilePart } from './validation.js';
 
 export async function searchYouTube(query) {
   const { stdout } = await runCommand(config.ytdlpCommand, [
@@ -28,6 +28,10 @@ export function parseSearchResults(stdout) {
 }
 
 export async function downloadAudio(url, title, id) {
+  if (!isYouTubeUrl(url)) {
+    throw new AppError('유효한 유튜브 URL을 입력해 주세요.', 400, 'INVALID_YOUTUBE_URL');
+  }
+
   const { source } = await ensureDataDirs();
   const safeTitle = sanitizeFilePart(title);
   const safeId = sanitizeFilePart(id);

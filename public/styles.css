@@ -45,6 +45,12 @@ button:hover {
   border-color: var(--accent-dark);
 }
 
+button:disabled {
+  background: #8aa9a5;
+  border-color: #8aa9a5;
+  cursor: wait;
+}
+
 button:focus-visible,
 input:focus-visible,
 a:focus-visible {
@@ -137,8 +143,41 @@ label {
   color: var(--muted);
 }
 
+.status[data-state="error"] {
+  color: var(--danger);
+}
+
 .results {
+  display: grid;
+  gap: 10px;
   min-height: 72px;
+}
+
+.result {
+  display: grid;
+  width: 100%;
+  gap: 4px;
+  min-height: auto;
+  border-color: var(--line);
+  background: #ffffff;
+  color: var(--text);
+  padding: 12px;
+  text-align: left;
+}
+
+.result:hover {
+  border-color: var(--accent);
+  background: #eef7f5;
+}
+
+.result-title {
+  font-weight: 800;
+}
+
+.result-meta {
+  color: var(--muted);
+  font-size: 0.92rem;
+  font-weight: 600;
 }
 
 .editor audio {

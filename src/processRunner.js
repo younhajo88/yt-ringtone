@@ -5,22 +5,38 @@ import { AppError } from './errors.js';
 
 export function runCommand(command, args = [], options = {}) {
   const timeoutMs = options.timeoutMs ?? config.commandTimeoutMs;
+  const spawnCommand = options.spawn ?? spawn;
 
   return new Promise((resolve, reject) => {
     let settled = false;
-    let timedOut = false;
     let stdout = '';
     let stderr = '';
 
-    const child = spawn(command, args, {
+    const child = spawnCommand(command, args, {
       cwd: options.cwd,
       env: options.env,
       windowsHide: true,
     });
 
     const timeout = setTimeout(() => {
-      timedOut = true;
-      child.kill();
+      if (settled) {
+        return;
+      }
+
+      settled = true;
+
+      try {
+        child.kill();
+      } catch {
+        // The timeout error is the failure callers need to handle.
+      }
+
+      reject(createCommandError('명령 실행 시간이 초과되었습니다.', 504, 'COMMAND_TIMEOUT', {
+        command,
+        args,
+        stdout,
+        stderr,
+      }));
     }, timeoutMs);
 
     child.stdout?.setEncoding('utf8');
@@ -69,17 +85,6 @@ export function runCommand(command, args = [], options = {}) {
 
       settled = true;
       clearTimeout(timeout);
-
-      if (timedOut) {
-        reject(createCommandError('명령 실행 시간이 초과되었습니다.', 504, 'COMMAND_TIMEOUT', {
-          command,
-          args,
-          stdout,
-          stderr,
-          signal,
-        }));
-        return;
-      }
 
       if (exitCode !== 0) {
         reject(createCommandError('명령 실행에 실패했습니다.', 500, 'COMMAND_FAILED', {

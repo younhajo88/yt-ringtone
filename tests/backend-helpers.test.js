@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
+import { EventEmitter } from 'node:events';
+import { PassThrough } from 'node:stream';
 import { describe, test } from 'node:test';
 
 import { config } from '../src/config.js';
 import { AppError } from '../src/errors.js';
-import { createClip, createTrack, getClip, getTrack } from '../src/jobs.js';
+import { cleanupOldJobs, createClip, createTrack, getClip, getTrack } from '../src/jobs.js';
 import { runCommand } from '../src/processRunner.js';
 import { downloadAudio, parseSearchResults } from '../src/youtube.js';
 
@@ -21,6 +23,22 @@ describe('jobs', () => {
   test('throws AppError when a track or clip is missing', () => {
     assertAppErrorCode(() => getTrack('missing-track'), 'TRACK_NOT_FOUND');
     assertAppErrorCode(() => getClip('missing-clip'), 'CLIP_NOT_FOUND');
+  });
+
+  test('cleanupOldJobs removes only records older than the max age', () => {
+    const oldTrack = createTrack({ title: 'Old track' });
+    const newTrack = createTrack({ title: 'New track' });
+    const oldClip = createClip({ trackId: oldTrack.id });
+    const newClip = createClip({ trackId: newTrack.id });
+
+    oldTrack.createdAt = Date.now() - 60_000;
+    oldClip.createdAt = Date.now() - 60_000;
+
+    assert.deepEqual(cleanupOldJobs(30_000), { tracksRemoved: 1, clipsRemoved: 1 });
+    assertAppErrorCode(() => getTrack(oldTrack.id), 'TRACK_NOT_FOUND');
+    assertAppErrorCode(() => getClip(oldClip.id), 'CLIP_NOT_FOUND');
+    assert.equal(getTrack(newTrack.id), newTrack);
+    assert.equal(getClip(newClip.id), newClip);
   });
 });
 
@@ -49,6 +67,25 @@ describe('runCommand', () => {
       runCommand(process.execPath, ['-e', 'setTimeout(() => {}, 1000);'], { timeoutMs: 20 }),
       error => error instanceof AppError && error.code === 'COMMAND_TIMEOUT',
     );
+  });
+
+  test('rejects immediately on timeout even when the child never closes', async () => {
+    const child = createFakeChild();
+    const startedAt = Date.now();
+
+    await assert.rejects(
+      runCommand('fake-command', [], {
+        timeoutMs: 20,
+        spawn: () => child,
+      }),
+      error => error instanceof AppError && error.code === 'COMMAND_TIMEOUT',
+    );
+
+    assert.equal(child.killCalls, 1);
+    assert.ok(Date.now() - startedAt < 200);
+
+    child.emit('close', 0, null);
+    child.emit('error', new Error('late error'));
   });
 });
 
@@ -115,4 +152,18 @@ function assertAppErrorCode(fn, code) {
     fn,
     error => error instanceof AppError && error.code === code,
   );
+}
+
+function createFakeChild() {
+  const child = new EventEmitter();
+
+  child.stdout = new PassThrough();
+  child.stderr = new PassThrough();
+  child.killCalls = 0;
+  child.kill = () => {
+    child.killCalls += 1;
+    return true;
+  };
+
+  return child;
 }

@@ -9,7 +9,7 @@ export function createTrack(data) {
   const track = {
     ...data,
     id: randomUUID(),
-    createdAt: new Date().toISOString(),
+    createdAt: Date.now(),
   };
 
   tracks.set(track.id, track);
@@ -30,7 +30,7 @@ export function createClip(data) {
   const clip = {
     ...data,
     id: randomUUID(),
-    createdAt: new Date().toISOString(),
+    createdAt: Date.now(),
   };
 
   clips.set(clip.id, clip);
@@ -45,4 +45,35 @@ export function getClip(id) {
   }
 
   return clip;
+}
+
+export function cleanupOldJobs(maxAgeMs) {
+  const cutoff = Date.now() - maxAgeMs;
+
+  return {
+    tracksRemoved: removeOlderThan(tracks, cutoff),
+    clipsRemoved: removeOlderThan(clips, cutoff),
+  };
+}
+
+function removeOlderThan(records, cutoff) {
+  let removed = 0;
+
+  for (const [id, record] of records) {
+    if (createdAtMs(record.createdAt) < cutoff) {
+      records.delete(id);
+      removed += 1;
+    }
+  }
+
+  return removed;
+}
+
+function createdAtMs(value) {
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }

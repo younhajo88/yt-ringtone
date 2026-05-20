@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
 
+import { config } from '../src/config.js';
 import { createApp } from '../src/server.js';
 
 async function withServer(services, callback) {
@@ -156,4 +157,8 @@ test('clip creates a download URL for prepared track', async () => {
     assert.equal(response.status, 200);
     assert.match(body.downloadUrl, /^\/api\/download\//);
   });
+});
+
+test('default clip duration is 29 seconds', () => {
+  assert.equal(config.clipDurationSeconds, 29);
 });

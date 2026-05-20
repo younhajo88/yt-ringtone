@@ -56,7 +56,7 @@ clipForm.addEventListener('submit', async event => {
   try {
     clipButton.disabled = true;
     downloadLink.hidden = true;
-    setStatus('30초 MP3를 만드는 중입니다.');
+    setStatus('29초 MP3를 만드는 중입니다.');
     const clip = await postJson('/api/clip', {
       id: selectedTrackId,
       startSeconds: Number(startInput.value),
@@ -116,7 +116,7 @@ async function prepareTrack(url, title) {
     editorTitle.textContent = track.title;
     previewAudio.src = track.audioUrl;
 
-    const maxStart = Math.max(0, Math.floor(Number(track.durationSeconds || 0) - 30));
+  const maxStart = Math.max(0, Math.floor(Number(track.durationSeconds || 0) - 29));
     startRange.max = String(maxStart);
     startInput.max = String(maxStart);
     startRange.value = '0';

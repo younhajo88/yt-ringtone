@@ -12,7 +12,7 @@ export const config = {
   maxSearchResults: 5,
   maxQueryLength: 120,
   maxSourceDurationSeconds: Number(process.env.MAX_SOURCE_DURATION_SECONDS || 1800),
-  clipDurationSeconds: 30,
+  clipDurationSeconds: 29,
   commandTimeoutMs: 120000,
   ytdlpCommand: process.env.YTDLP_COMMAND || 'yt-dlp',
   ffmpegCommand: process.env.FFMPEG_COMMAND || 'ffmpeg',

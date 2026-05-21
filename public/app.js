@@ -91,6 +91,23 @@ function renderResults(items) {
     button.type = 'button';
     button.className = 'result';
 
+    if (item.thumbnail) {
+      const thumbnail = document.createElement('img');
+      thumbnail.className = 'result-thumbnail';
+      thumbnail.src = item.thumbnail;
+      thumbnail.alt = '';
+      thumbnail.loading = 'lazy';
+      button.append(thumbnail);
+    } else {
+      const placeholder = document.createElement('span');
+      placeholder.className = 'result-thumbnail result-thumbnail-placeholder';
+      placeholder.textContent = 'YT';
+      button.append(placeholder);
+    }
+
+    const content = document.createElement('span');
+    content.className = 'result-content';
+
     const title = document.createElement('span');
     title.className = 'result-title';
     title.textContent = item.title || '제목 없음';
@@ -99,7 +116,8 @@ function renderResults(items) {
     meta.className = 'result-meta';
     meta.textContent = [item.channel, formatDuration(item.duration)].filter(Boolean).join(' · ');
 
-    button.append(title, meta);
+    content.append(title, meta);
+    button.append(content);
     button.addEventListener('click', () => prepareTrack(item.url, item.title || 'YouTube audio'));
     results.append(button);
   }

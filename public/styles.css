@@ -155,15 +155,15 @@ label {
 
 .result {
   display: grid;
-  grid-template-columns: 96px 1fr;
+  grid-template-columns: 140px 1fr;
   align-items: center;
   width: 100%;
-  gap: 12px;
-  min-height: auto;
+  gap: 14px;
+  min-height: 104px;
   border-color: var(--line);
   background: #ffffff;
   color: var(--text);
-  padding: 12px;
+  padding: 14px;
   text-align: left;
 }
 
@@ -174,7 +174,7 @@ label {
 
 .result-thumbnail {
   display: block;
-  width: 96px;
+  width: 140px;
   aspect-ratio: 16 / 9;
   border-radius: 6px;
   background: #e8ece4;
@@ -207,11 +207,13 @@ label {
 
 @media (max-width: 420px) {
   .result {
-    grid-template-columns: 84px 1fr;
+    grid-template-columns: 120px 1fr;
+    min-height: 92px;
+    padding: 12px;
   }
 
   .result-thumbnail {
-    width: 84px;
+    width: 120px;
   }
 }
 

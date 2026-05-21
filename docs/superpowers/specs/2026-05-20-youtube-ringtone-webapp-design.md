@@ -165,5 +165,5 @@ Full automated YouTube download tests can be avoided initially because they are 
 - Keep server metadata in memory for version 1.
 - Keep generated files on disk, but do not guarantee old download links after server restart.
 - Defer waveform editing until after the first usable version.
-- Use a configurable port with `3000` as the default.
+- Use a configurable port with `8001` as the default.
 - Bind to `0.0.0.0` when the user wants phone access from the network.

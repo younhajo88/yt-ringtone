@@ -85,7 +85,7 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 export const config = {
   rootDir,
   host: process.env.HOST || '0.0.0.0',
-  port: Number(process.env.PORT || 3000),
+  port: Number(process.env.PORT || 8001),
   dataDir: path.join(rootDir, 'data'),
   maxSearchResults: 5,
   maxQueryLength: 120,
@@ -373,11 +373,11 @@ git commit -m "feat: add ringtone browser workflow"
 
 실행: `npm start`
 
-예상 결과: `YT Ringtone listening at http://0.0.0.0:3000` 로그 출력.
+예상 결과: `YT Ringtone listening at http://0.0.0.0:8001` 로그 출력.
 
 - [ ] **3단계: PC 브라우저 테스트**
 
-열기: `http://127.0.0.1:3000`
+열기: `http://127.0.0.1:8001`
 
 예상 결과:
 
@@ -390,7 +390,7 @@ git commit -m "feat: add ringtone browser workflow"
 
 - [ ] **4단계: 휴대폰 브라우저 테스트**
 
-`ipconfig`로 PC IPv4 주소를 확인한 뒤, 휴대폰에서 `http://PC_IP:3000`을 연다.
+`ipconfig`로 PC IPv4 주소를 확인한 뒤, 휴대폰에서 `http://PC_IP:8001`을 연다.
 
 예상 결과:
 

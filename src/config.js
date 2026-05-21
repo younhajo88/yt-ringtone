@@ -7,7 +7,7 @@ const rootDir = path.resolve(path.dirname(currentFile), '..');
 export const config = {
   rootDir,
   host: process.env.HOST || '0.0.0.0',
-  port: Number.parseInt(process.env.PORT || '3000', 10),
+  port: Number.parseInt(process.env.PORT || '8001', 10),
   dataDir: process.env.DATA_DIR || path.join(rootDir, 'data'),
   maxSearchResults: 5,
   maxQueryLength: 120,

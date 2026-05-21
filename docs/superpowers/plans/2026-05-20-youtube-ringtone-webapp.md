@@ -85,7 +85,7 @@ const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 export const config = {
   rootDir,
   host: process.env.HOST || '0.0.0.0',
-  port: Number(process.env.PORT || 3000),
+  port: Number(process.env.PORT || 8001),
   dataDir: path.join(rootDir, 'data'),
   maxSearchResults: 5,
   maxQueryLength: 120,
@@ -872,11 +872,11 @@ Expected: prints ffmpeg version details.
 
 Run: `npm start`
 
-Expected: logs `YT Ringtone listening at http://0.0.0.0:3000`.
+Expected: logs `YT Ringtone listening at http://0.0.0.0:8001`.
 
 - [ ] **Step 3: Test from PC browser**
 
-Open: `http://127.0.0.1:3000`
+Open: `http://127.0.0.1:8001`
 
 Expected:
 
@@ -889,7 +889,7 @@ Expected:
 
 - [ ] **Step 4: Test from phone browser**
 
-Find the PC IPv4 address with `ipconfig`, then open `http://PC_IP:3000` on the phone.
+Find the PC IPv4 address with `ipconfig`, then open `http://PC_IP:8001` on the phone.
 
 Expected:
 
